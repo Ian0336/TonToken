@@ -1,17 +1,17 @@
 import { Address, toNano } from 'ton-core';
-import { JettonMinter, JettonMinterContent, jettonContentToCell, jettonMinterConfigToCell } from '../wrappers/JettonMinter';
+import { JettonMinter, JettonMinterContent, jettonContentToCellOffChain, jettonContentToCellOnChain, jettonMinterConfigToCell } from '../wrappers/JettonMinter';
 import { compile, NetworkProvider, UIProvider} from '@ton-community/blueprint';
 import { promptAddress, promptBool, promptUrl } from '../wrappers/ui-utils';
 
 const formatUrl = "https://github.com/ton-blockchain/TEPs/blob/master/text/0064-token-data-standard.md#jetton-metadata-example-offchain";
 const exampleContent = {
-                          "name": "Sample Jetton",
-                          "description": "Sample of Jetton",
-                          "symbol": "JTN",
-                          "decimals": 0,
-                          "image": "https://www.svgrepo.com/download/483336/coin-vector.svg"
+                          name: "Seekers Alliance",
+                          description: "Jetton for Seekers Alliance",
+                          symbol: "SA",
+                          decimals: 9,
+                          image: "https://raw.githubusercontent.com/Ian0336/Ton_metadata/main/red_medal.png"
                        };
-const urlPrompt = 'Please specify url pointing to jetton metadata(json):';
+const urlPrompt = 'https://raw.githubusercontent.com/Ian0336/Ton_metadata/main/metadata.json';
 
 export async function run(provider: NetworkProvider) {
     const ui       = provider.ui();
@@ -43,7 +43,7 @@ export async function run(provider: NetworkProvider) {
 
     } while(!dataCorrect);
 
-    const content = jettonContentToCell({type:1,uri:contentUrl});
+    const content = jettonContentToCellOnChain({type:0,uri:contentUrl}, exampleContent);
 
     const wallet_code = await compile('JettonWallet');
 

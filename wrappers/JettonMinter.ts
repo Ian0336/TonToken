@@ -1,5 +1,14 @@
-import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Sender, SendMode, toNano } from 'ton-core';
-
+import { Address, beginCell, Cell, Contract, contractAddress, ContractProvider, Dictionary, Sender, SendMode, toNano } from 'ton-core';
+import { sha256_sync } from 'ton-crypto';
+export function toSha256(s: string): bigint {
+    return BigInt('0x' + sha256_sync(s).toString('hex'));
+}
+export function toTextCell(s: string | number): Cell {
+    if (typeof s == 'number') {
+        s = s.toString();
+    }
+    return beginCell().storeUint(0, 8).storeStringTail(s).endCell();
+}
 export type JettonMinterContent = {
     type:0|1,
     uri:string
@@ -15,10 +24,22 @@ export function jettonMinterConfigToCell(config: JettonMinterConfig): Cell {
            .endCell();
 }
 
-export function jettonContentToCell(content:JettonMinterContent) {
+export function jettonContentToCellOffChain(content:JettonMinterContent) {
     return beginCell()
-                      .storeUint(content.type, 8)
+                      .storeUint(1, 8)
                       .storeStringTail(content.uri) //Snake logic under the hood
+           .endCell();
+}
+export function jettonContentToCellOnChain(content:JettonMinterContent, metadata: any) {
+    const jettonMinterContentDict = Dictionary.empty(Dictionary.Keys.BigUint(256), Dictionary.Values.Cell())
+        .set(toSha256('name'), toTextCell(metadata.name))
+        .set(toSha256('description'), toTextCell(metadata.description))
+        .set(toSha256('symbol'), toTextCell(metadata.symbol))
+        .set(toSha256('decimals'), toTextCell(metadata.decimals.toString()))
+        .set(toSha256('image'), toTextCell(metadata.image));
+    return beginCell()
+                      .storeUint(0, 8)
+                      .storeDict(jettonMinterContentDict) 
            .endCell();
 }
 
