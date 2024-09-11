@@ -1,7 +1,7 @@
 {
-   "name": "Seekers Alliance",
+   "name": "SA"
    "description": "Jetton for Seekers Alliance",
    "symbol": "SA",
-   "decimals": 0,
+   "decimals": "0",
    "image": "https://raw.githubusercontent.com/Ian0336/Ton_metadata/main/red_medal.png"
-};
+}
